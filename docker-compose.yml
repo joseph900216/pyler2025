@@ -1,0 +1,45 @@
+services:
+  pyler-db:
+    container_name: pyler-db
+    image: postgres:15.12-alpine3.21
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: pyler_db
+      POSTGRES_USER: pyler
+      POSTGRES_PASSWORD: Pyler!@34
+    volumes:
+      - "./plyer/data:/var/lib/postgresql/data"
+  pyler-redis:
+    image: redis:alpine
+    container_name: pyler-redis
+    ports:
+      - "6379:6379"
+  pyler-jwt-server:
+    container_name: pyler-jwt-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./logs/pyler-jwt-server:/app/logs
+    ports:
+      - "8080:8080"
+    command: ["java", "-jar", "app.jar"] # 실행 명령어 설정
+    depends_on:
+      - pyler-db
+  pyler-user-server:
+    container_name: pyler-user-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./logs/pyler-user-server:/app/logs
+    ports:
+      - "8080:8080"
+    command: [ "java", "-jar", "app.jar" ] # 실행 명령어 설정
+    depends_on:
+      - pyler-db
+
