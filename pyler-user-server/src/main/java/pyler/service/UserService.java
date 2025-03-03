@@ -12,8 +12,6 @@ public interface UserService {
 
     UserResDTO postUserADD(UserAddDTO userAddDTO);
 
-    ResponseEntity<?> getUser(UserDTO userDTO);
-
     UserResDTO getUserLogin(UserLoginDTO userLoginDTO);
 
 }

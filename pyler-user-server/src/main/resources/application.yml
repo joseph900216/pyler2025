@@ -1,0 +1,43 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /pyler-user-api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: pyler-user-server
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pyler-db
+    username: pyler
+    password: Pyler!@34
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+jwt:
+  server:
+    url: http://localhost:8081/pyler-jwt-api

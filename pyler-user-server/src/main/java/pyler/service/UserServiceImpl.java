@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pyler.config.JwtTokenClient;
 import pyler.domain.dto.*;
 import pyler.domain.entity.UserEntity;
 import pyler.enums.ErrorCode;
@@ -25,10 +26,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
-    private UserRepository userRepository;
-    private PasswordUtil passwordUtil;
+    private final UserRepository userRepository;
+    private final PasswordUtil passwordUtil;
+    private final JwtTokenClient jwtTokenClient;
 
-    @Comment("사용자 등록")
+    /**
+     * User 등록
+     * @param userAddDTO
+     * @return
+     */
     @Override
     @Transactional(readOnly = true)
     public UserResDTO postUserADD(UserAddDTO userAddDTO) {
@@ -57,23 +63,13 @@ public class UserServiceImpl implements UserService{
 
     }
 
+    /**
+     * User login
+     * @param userLoginDTO
+     * @return
+     */
     @Override
-    public ResponseEntity<?> getUser(UserDTO userDTO) throws ServiceException {
-        try {
-
-
-
-            return null;
-        } catch (ServiceException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new ServiceException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Comment("로그인 및 Token 발급")
-    @Override
+    @Transactional(readOnly = true)
     public UserResDTO getUserLogin(UserLoginDTO userLoginDTO) {
         //사용자 조회
         UserEntity userEntity = userRepository.findByUserEmailAndIsDel(userLoginDTO.getEmail(), false)
@@ -83,11 +79,20 @@ public class UserServiceImpl implements UserService{
         if(!passwordUtil.verifyPassword(userLoginDTO.getPassword(), userEntity.getPassWord()))
             throw new ServiceException(ErrorCode.INVALID_USER_PASSWORD);
 
-        // 사용자 활성화 여부
-//        if (userEntity.get().isDel())
-//            throw new ServiceException(ErrorCode.)
+        // Token 생성
+        TokenDTO tokenDTO = jwtTokenClient.createToken(
+                userEntity.getId(),
+                userEntity.getUserEmail(),
+                userEntity.getUserRole()
+        );
 
-
-        return null;
+        return UserResDTO.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getUserName())
+                .email(userEntity.getUserEmail())
+                .role(userEntity.getUserRole())
+                .accessToken(tokenDTO.getAccessToken())
+                .refreshToken(tokenDTO.getRefreshToken())
+                .build();
     }
 }

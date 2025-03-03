@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: plyer-common
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pyler-db
+    username: pyler
+    password: Pyler!@34
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: 7Cx5ZrJz4NvRHkWplPKif6HhTyjZ9Mq8TF99h+vKXM02ft9FBeV/pJMYP8x47wJyxhkW6l0PbOapORDBrFdXiQ==

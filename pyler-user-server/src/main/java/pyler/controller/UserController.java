@@ -28,8 +28,7 @@ public class UserController {
     @PostMapping(RequestMap.user + "/add")
     public ResponseEntity<?> postUserAdd(@Valid @RequestBody UserAddDTO userAddDTO) {
         UserResDTO userResDTO = userService.postUserADD(userAddDTO);
-        return ResEntity.success(ErrorCode.USER_ADD_SUCCESS);
-
+        return ResEntity.success(userResDTO);
     }
 
     /***
@@ -40,6 +39,6 @@ public class UserController {
     @GetMapping(RequestMap.user + "/login")
     public ResponseEntity<?> getUserLogin(@Valid @RequestBody UserLoginDTO userLoginDTO) {
         UserResDTO userResDTO = userService.getUserLogin(userLoginDTO);
-        return ResEntity.success(ErrorCode.USER_ADD_SUCCESS.getMessage(), userResDTO);
+        return ResEntity.success(userResDTO);
     }
 }
