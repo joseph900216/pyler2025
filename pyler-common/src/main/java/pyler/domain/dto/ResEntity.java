@@ -22,7 +22,7 @@ public class ResEntity {
 
     public static <T> ResponseEntity<ApiResponse<T>> created(T data) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Created successfully", data));
+                .body(ApiResponse.success("Created Success", data));
     }
 
     public static ResponseEntity<ApiResponse<Void>> noContent() {
