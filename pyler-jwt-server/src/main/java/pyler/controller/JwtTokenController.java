@@ -18,7 +18,7 @@ public class JwtTokenController {
 
     /**
      * Token 생성 API
-     * @param tokenCreateReqDTO (userId, userEmail, userRole)
+     * @param tokenCreateReqDTO (userId, userEmail, isMaster)
      * @return
      */
     @PostMapping
@@ -26,7 +26,7 @@ public class JwtTokenController {
         TokenDTO tokenDTO = jwtTokenService.createToken(
                 tokenCreateReqDTO.getUserId(),
                 tokenCreateReqDTO.getUserEmail(),
-                tokenCreateReqDTO.getUserRoel()
+                tokenCreateReqDTO.getIsMaster()
         );
         return ResEntity.success(tokenDTO);
     }

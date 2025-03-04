@@ -1,11 +1,25 @@
 dependencies {
+    // 공통 모듈 의존성
     implementation project(':pyler-common')
 
-    implementation 'org.springframework.boot:spring-boot-starter'
+    // 웹 & 보안
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // 데이터 관련
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'org.postgresql:postgresql'
 
-    // 테스트 의존성
+    // 테스트
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// 실행 가능한 Jar
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
 }

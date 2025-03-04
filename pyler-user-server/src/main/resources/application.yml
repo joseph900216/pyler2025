@@ -1,18 +1,12 @@
 server:
-  port: 8080
-  servlet:
-    context-path: /pyler-user-api
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
+  port: 8081
 
 spring:
   application:
     name: pyler-user-server
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/pyler-db
+    url: jdbc:postgresql://pyler-db:5432/pyler_db
     username: pyler
     password: Pyler!@34
     driver-class-name: org.postgresql.Driver
@@ -35,9 +29,14 @@ spring:
 logging:
   level:
     root: info
+    pyler: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
 
 jwt:
+  client:
+    enabled: true # Jwt Interceptor 사용
   server:
-    url: http://localhost:8081/pyler-jwt-api
+    url: http://pyler-jwt-server:8080

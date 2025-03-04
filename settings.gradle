@@ -2,4 +2,6 @@ rootProject.name = 'pyler'
 include 'pyler-jwt-server'
 include 'pyler-user-server'
 include 'pyler-common'
+include 'pyler-imagehub-server'
+include 'pyler-imagehub-server'
 

@@ -64,13 +64,13 @@ public class JwtTokenExtractionService {
     }
 
     /**
-     * Token 내부의 user role 추출
+     * Token 내부의 user isMaster 추출
      * @param token
-     * @return userRole
+     * @return isMaster
      */
-    public Integer getUserRole(String token) {
+    public Boolean getIsMaster(String token) {
         Claims claims = extractAllClaims(token);
-        return claims.get("userRole", Integer.class);
+        return claims.get("isMaster", Boolean.class);
     }
 
     /**

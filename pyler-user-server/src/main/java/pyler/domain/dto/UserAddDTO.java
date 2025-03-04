@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserAddDTO {
 
-    private String name;
-    private String password;
-    private String email;
-    private String role;
+    private String userName;
+    private String userEmail;
+    private String userPassword;
+    private Boolean isMaster;
 }

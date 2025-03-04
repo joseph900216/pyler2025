@@ -34,10 +34,10 @@ public class JwtTokenCreateService {
      * Token 생성
      * @param userId
      * @param userEmail
-     * @param userRole
+     * @param isMaster
      * @return Token(Access Token, Refresh Token)
      */
-    public TokenDTO createToken(Long userId, String userEmail, int userRole) {
+    public TokenDTO createToken(Long userId, String userEmail, Boolean isMaster) {
         Date nowDate = new Date();
         Key key = jwtKeyProvider.getSignKey();
 
@@ -45,7 +45,7 @@ public class JwtTokenCreateService {
         String accessToken = Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("userEmail", userEmail)
-                .claim("userRole", userRole)
+                .claim("isMaster", isMaster)
                 .setIssuedAt(nowDate)
                 .setExpiration(new Date(nowDate.getTime() + accessTokenExpire))
                 .signWith(key, SignatureAlgorithm.HS384)
@@ -77,17 +77,17 @@ public class JwtTokenCreateService {
      * 신규 Access Token 생성
      * @param userId
      * @param email
-     * @param userRole
+     * @param isMaster
      * @return new Access Token
      */
-    public String createAccessToken(Long userId, String email, int userRole) {
+    public String createAccessToken(Long userId, String email, Boolean isMaster) {
         Date nowDate = new Date();
         Key key = jwtKeyProvider.getSignKey();
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("userEmail", email)
-                .claim("userRole", userRole)
+                .claim("isMaster", isMaster)
                 .setIssuedAt(nowDate)
                 .setExpiration(new Date(nowDate.getTime() + accessTokenExpire))
                 .signWith(key, SignatureAlgorithm.HS256)

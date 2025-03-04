@@ -17,6 +17,8 @@ public enum ErrorCode {
     USER_LOGIN_SUCCESS(HttpStatus.OK, "p-200", "Login Success"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "p-404", "등록된 사용자가 아닙니다."),
     INVALID_USER_PASSWORD(HttpStatus.BAD_REQUEST, "p-400", "잘못된 비밀번호 입니다."),
+    EMAIL_OR_PASSWORD_IS_NOT_EXIST(HttpStatus.BAD_REQUEST, "p-400", "email과 password는 필수 입니다."),
+    INVALIDE_ROLE_CODE(HttpStatus.NOT_FOUND, "p-404", "잘못된 User 권한 코드입니다."),
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "P-401", "인증이 필요합니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "P-403", "접근 권한이 없습니다."),

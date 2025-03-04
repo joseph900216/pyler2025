@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 public class BaseEntity {
-    
+
     @Comment("생성일시")
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp

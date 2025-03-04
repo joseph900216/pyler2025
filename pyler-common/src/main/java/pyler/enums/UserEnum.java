@@ -7,10 +7,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserEnum {
 
-    ADMIN(1, "admin"),
-    USER(2, "user");
+    IMAGE_UPLOAD(1, "UPLOAD"),
+    IMAGE_READ(2, "READ"),
+    IMAGE_UPDATE(3, "UPDATE"),
+    IMAGE_DELETE(4, "DELETE");
 
-    private int code;
-    private String name;
+
+    private final int code;
+    private final String name;
 
 }

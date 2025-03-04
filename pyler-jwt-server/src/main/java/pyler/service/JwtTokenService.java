@@ -23,11 +23,11 @@ public class JwtTokenService {
      * Token 생성
      * @param userId
      * @param userEmail
-     * @param userRole
+     * @param isMaster
      * @return
      */
-    public TokenDTO createToken(Long userId, String userEmail, int userRole) {
-        return jwtTokenCreateService.createToken(userId, userEmail, userRole);
+    public TokenDTO createToken(Long userId, String userEmail, Boolean isMaster) {
+        return jwtTokenCreateService.createToken(userId, userEmail, isMaster);
     }
 
     /**
@@ -47,12 +47,12 @@ public class JwtTokenService {
     public TokenInfoDTO getTokenInfo(String token) {
         Long userId = jwtTokenExtractionService.getUserId(token);
         String userEmail = jwtTokenExtractionService.getUserEmail(token);
-        Integer userRole = jwtTokenExtractionService.getUserRole(token);
+        boolean isMaster = jwtTokenExtractionService.getIsMaster(token);
 
         return TokenInfoDTO.builder()
                 .userId(userId)
                 .userEmail(userEmail)
-                .userRole(userRole)
+                .isMaster(isMaster)
                 .build();
     }
 
@@ -92,12 +92,12 @@ public class JwtTokenService {
     }
 
     /**
-     * token 내, userRole 조회
+     * token 내, isMaster 조회
      * @param token
      * @return
      */
-    public Integer getUserRole(String token) {
-        return jwtTokenExtractionService.getUserRole(token);
+    public Boolean getIsMaster(String token) {
+        return jwtTokenExtractionService.getIsMaster(token);
     }
 
 }

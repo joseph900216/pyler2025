@@ -1,3 +1,8 @@
+plugins {
+    id 'java-library' // 라이브러리 프로젝트
+}
+
+// 공통 라이브러리는 실행 가능 jar가 아님
 bootJar {
     enabled = false
 }
@@ -6,19 +11,28 @@ jar {
     enabled = true
 }
 
-
 dependencies {
-    // 공통 유틸리티
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // 웹 관련
+    api 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.boot:spring-boot-starter-validation'
 
-    // 공통 보안 컴포넌트
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // 데이터 관련
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // AOP
+    api 'org.springframework.boot:spring-boot-starter-aop'
+
+    // 보안 관련
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Bouncy Castle (Argon2 암호화 사용)
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.72'
+    implementation 'org.bouncycastle:bcpkix-jdk15to18:1.72'
+
+    // 테스트 의존성
+    testImplementation 'org.springframework.security:spring-security-test'
 }

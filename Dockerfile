@@ -1,5 +1,5 @@
 # 베이스 이미지 선택 (Java와 Gradle 포함)
-FROM gradle:7.6-jdk21 AS builder
+FROM gradle:8.12.1-jdk21-corretto AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app

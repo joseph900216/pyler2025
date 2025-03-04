@@ -4,16 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pyler.config.JwtTokenClient;
+import pyler.client.JwtTokenClient;
 import pyler.domain.dto.*;
-import pyler.domain.entity.UserEntity;
+import pyler.domain.entity.UserRoleEntity;
+import pyler.domain.entity.UserUserEntity;
 import pyler.enums.ErrorCode;
 import pyler.enums.UserEnum;
 import pyler.exception.ServiceException;
 import pyler.repository.UserRepository;
+import pyler.repository.UserRoleRepository;
 import pyler.utils.PasswordUtil;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,8 +26,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
-    private final PasswordUtil passwordUtil;
+    private final UserRoleRepository userRoleRepository;
     private final JwtTokenClient jwtTokenClient;
+
 
     /**
      * User 등록
@@ -30,29 +36,57 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public UserResDTO postUserADD(UserAddDTO userAddDTO) {
-        UserEntity userEntity = userRepository.findByUserEmailAndIsDel(userAddDTO.getEmail(), false)
-                .orElseThrow(() -> new ServiceException(ErrorCode.ALREADY_EXIST_USER));
+
+        if (userAddDTO.getUserEmail().isEmpty() || userAddDTO.getUserPassword().isEmpty()) {
+            throw new ServiceException(ErrorCode.EMAIL_OR_PASSWORD_IS_NOT_EXIST);
+        }
+
+        Optional<UserUserEntity> userUserEntity = userRepository.findByUserEmailAndIsDel(userAddDTO.getUserEmail(), false);
+        if (userUserEntity.isPresent())
+            throw new ServiceException(ErrorCode.ALREADY_EXIST_USER);
 
         // 패스워드 암호화(알고리즘: argon2)
-        String aron2Pw = passwordUtil.hashPassWord(userAddDTO.getPassword());
+        String aron2Pw = PasswordUtil.hashPassWord(userAddDTO.getUserPassword());
 
-        int userRole = userAddDTO.getRole().equals(UserEnum.ADMIN.getName()) ? UserEnum.ADMIN.getCode() : UserEnum.USER.getCode();
+        boolean userRole = userAddDTO.getIsMaster();
 
-        UserEntity user = UserEntity.builder()
-                .userName(userAddDTO.getName())
-                .userEmail(userAddDTO.getEmail())
+        UserUserEntity user = UserUserEntity.builder()
+                .userName(userAddDTO.getUserName())
+                .userEmail(userAddDTO.getUserEmail())
                 .passWord(aron2Pw)
-                .userRole(userRole)
+                .isMaster(userRole)
+                .isActive(true)
+                .isDel(false)
                 .build();
 
-        UserEntity savedUser = userRepository.save(user);
+        UserUserEntity savedUser = userRepository.save(user);
+
+        List<UserEnum> userEnums = Arrays.asList(
+                UserEnum.IMAGE_UPLOAD,
+                UserEnum.IMAGE_READ,
+                UserEnum.IMAGE_UPDATE,
+                UserEnum.IMAGE_DELETE
+        );
+
+        List<UserRoleEntity> userRoleEntities = userEnums.stream()
+                .map(role -> UserRoleEntity.builder()
+                        .userId(savedUser.getId())
+                        .userRoleType(role)
+                        .creatorId(savedUser.getId())
+                        .updatorId(savedUser.getId())
+                        .build())
+                .collect(Collectors.toList());
+        userRoleRepository.saveAll(userRoleEntities);
 
         return UserResDTO.builder()
                 .id(savedUser.getId())
-                .name(savedUser.getUserName())
-                .email(savedUser.getUserEmail())
+                .userName(savedUser.getUserName())
+                .userEmail(savedUser.getUserEmail())
+                .isMaster(savedUser.getIsMaster())
+                .isActive(savedUser.getIsActive())
+                .isDel(savedUser.getIsDel())
                 .build();
 
     }
@@ -64,27 +98,24 @@ public class UserServiceImpl implements UserService{
      */
     @Override
     @Transactional(readOnly = true)
-    public UserResDTO getUserLogin(UserLoginDTO userLoginDTO) {
+    public TokenDTO postUserLogin(UserLoginDTO userLoginDTO) {
         //사용자 조회
-        UserEntity userEntity = userRepository.findByUserEmailAndIsDel(userLoginDTO.getEmail(), false)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+        Optional<UserUserEntity> userUserEntity = userRepository.findByUserEmailAndIsDel(userLoginDTO.getEmail(), false);
+        if (userUserEntity.isEmpty())
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
 
         // 패스워드 검증
-        if(!passwordUtil.verifyPassword(userLoginDTO.getPassword(), userEntity.getPassWord()))
+        if(!PasswordUtil.verifyPassword(userLoginDTO.getPassword(), userUserEntity.get().getPassWord()))
             throw new ServiceException(ErrorCode.INVALID_USER_PASSWORD);
 
         // Token 생성
         TokenDTO tokenDTO = jwtTokenClient.createToken(
-                userEntity.getId(),
-                userEntity.getUserEmail(),
-                userEntity.getUserRole()
+                userUserEntity.get().getId(),
+                userUserEntity.get().getUserEmail(),
+                userUserEntity.get().getIsMaster()
         );
 
-        return UserResDTO.builder()
-                .id(userEntity.getId())
-                .name(userEntity.getUserName())
-                .email(userEntity.getUserEmail())
-                .role(userEntity.getUserRole())
+        return TokenDTO.builder()
                 .accessToken(tokenDTO.getAccessToken())
                 .refreshToken(tokenDTO.getRefreshToken())
                 .build();

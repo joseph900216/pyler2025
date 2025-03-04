@@ -10,9 +10,11 @@ import lombok.*;
 public class UserResDTO {
 
     private long id;
-    private String name;
-    private String email;
-    private int role;
+    private String userName;
+    private String userEmail;
+    private boolean isMaster;
+    private boolean isActive;
+    private boolean isDel;
     private String accessToken;
     private String refreshToken;
 

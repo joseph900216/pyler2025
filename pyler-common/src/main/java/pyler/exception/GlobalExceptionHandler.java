@@ -49,6 +49,16 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> handleAuthException(AuthException e) {
+        log.error("인증 예외 발생: {}", e.getMessage(), e);
+
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ErrorResponse.of(errorCode));
+    }
+
     /***
      * Filed Error 변환 유틸 메소트
      */

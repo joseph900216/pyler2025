@@ -56,10 +56,10 @@ class JwtTokenCreateServiceTest {
         //given
         Long userId = 1L;
         String userEmail = "joseph900216@gmail.com";
-        int userRole = 2;
+        boolean isMaster = false;
 
         //when
-        TokenDTO tokenDTO = jwtTokenCreateService.createToken(userId, userEmail, userRole);
+        TokenDTO tokenDTO = jwtTokenCreateService.createToken(userId, userEmail, isMaster);
 
         //then
         log.info("Access Token: {}", tokenDTO.getAccessToken());
@@ -82,10 +82,10 @@ class JwtTokenCreateServiceTest {
         //given
         Long userId = 1L;
         String userEmail="joseph900216@gmail.com";
-        int userRole = 2;
+        boolean isMaster = false;
 
         //when
-        String accessToken = jwtTokenCreateService.createAccessToken(userId, userEmail, userRole);
+        String accessToken = jwtTokenCreateService.createAccessToken(userId, userEmail, isMaster);
 
         //then
         log.info("Access Token: {}", accessToken);

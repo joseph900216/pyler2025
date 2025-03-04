@@ -1,8 +1,12 @@
-package pyler.config;
+package pyler.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -11,8 +15,10 @@ import pyler.domain.dto.*;
 import pyler.enums.ErrorCode;
 import pyler.exception.AuthException;
 
+/**
+ * 모듈 별 JWt 인증 인터셉터를 위한 Client 구성
+ */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class JwtTokenClient {
 
@@ -25,19 +31,20 @@ public class JwtTokenClient {
      * Client Token 생성
      * @param userId
      * @param userEmail
-     * @param userRole
+     * @param isMaster
      * @return
      */
-    public TokenDTO createToken(Long userId, String userEmail, int userRole) {
+    public TokenDTO createToken(Long userId, String userEmail, boolean isMaster) {
         String url = jwtServerUrl + RequestMap.api + RequestMap.v1 + RequestMap.token;
 
-        TokenCreateReqDTO req = new TokenCreateReqDTO(userId, userEmail, userRole);
+        TokenCreateReqDTO req = new TokenCreateReqDTO(userId, userEmail, isMaster);
 
         try {
-            ResponseEntity<ApiResponse<TokenDTO>> res = restTemplate.postForEntity(
+            ResponseEntity<ApiResponse<TokenDTO>> res = restTemplate.exchange(
                     url,
-                    req,
-                    (Class<ApiResponse<TokenDTO>>) (Class<?>) ApiResponse.class
+                    HttpMethod.POST,
+                    new HttpEntity<>(req),
+                    new ParameterizedTypeReference<ApiResponse<TokenDTO>>() {}
             );
 
             if (res.getBody() != null && res.getBody().getData() != null) {
@@ -61,9 +68,11 @@ public class JwtTokenClient {
         String url = jwtServerUrl + RequestMap.api + RequestMap.v1 + RequestMap.token + "/validation?token=" + token;
 
         try {
-            ResponseEntity<ApiResponse<Boolean>> res = restTemplate.getForEntity(
+            ResponseEntity<ApiResponse<Boolean>> res = restTemplate.exchange(
                     url,
-                    (Class<ApiResponse<Boolean>>) (Class<?>) ApiResponse.class
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<Boolean>>() {}
             );
 
             if (res.getBody() != null && res.getBody().getData() != null) {
@@ -90,10 +99,11 @@ public class JwtTokenClient {
         req.setRefreshToken(refreshToken);
 
         try {
-            ResponseEntity<ApiResponse<TokenDTO>> res = restTemplate.postForEntity(
+            ResponseEntity<ApiResponse<TokenDTO>> res = restTemplate.exchange(
                     url,
-                    req,
-                    (Class<ApiResponse<TokenDTO>>) (Class<?>) ApiResponse.class
+                    HttpMethod.POST,
+                    new HttpEntity<>(req),
+                    new ParameterizedTypeReference<ApiResponse<TokenDTO>>() {}
             );
 
             if (res.getBody() != null && res.getBody().getData() != null) {
@@ -116,9 +126,11 @@ public class JwtTokenClient {
         String url = jwtServerUrl + RequestMap.api + RequestMap.v1 + RequestMap.token +"/info?token=" + token;
 
         try {
-            ResponseEntity<ApiResponse<TokenInfoDTO>> res = restTemplate.getForEntity(
+            ResponseEntity<ApiResponse<TokenInfoDTO>> res = restTemplate.exchange(
                     url,
-                    (Class<ApiResponse<TokenInfoDTO>>) (Class<?>) ApiResponse.class
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<TokenInfoDTO>>() {}
             );
 
             if (res.getBody() != null && res.getBody().getData() != null) {
@@ -143,7 +155,12 @@ public class JwtTokenClient {
         req.setAccessToken(accessToken);
 
         try {
-            restTemplate.postForEntity(url, req, Void.class);
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(req),
+                    Void.class
+            );
         } catch (Exception e) {
             log.error("JWT API 통신 에러: {}", e.getMessage());
             throw new AuthException(ErrorCode.INTERNAL_SERVER_ERROR, "JWT API 통신 Error");

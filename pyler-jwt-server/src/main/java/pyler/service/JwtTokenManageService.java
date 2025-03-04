@@ -43,10 +43,10 @@ public class JwtTokenManageService {
         // Claim 내 정보 조회
         Claims claims = jwtTokenExtractionService.extractAllClaims(refreshToken);
         String userEmail = claims.get("userEmail", String.class);
-        Integer userRole = claims.get("userRole", Integer.class);
+        Boolean isMaster = claims.get("isMaster", Boolean.class);
 
         //신규 Access Token 발급
-        String newAccessToken = jwtTokenCreateService.createAccessToken(userId, userEmail, userRole);
+        String newAccessToken = jwtTokenCreateService.createAccessToken(userId, userEmail, isMaster);
 
         return TokenDTO.builder()
                 .accessToken(newAccessToken)

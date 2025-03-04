@@ -1,12 +1,14 @@
-package pyler.config;
+package pyler.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
+import pyler.client.JwtTokenClient;
 import pyler.domain.dto.TokenInfoDTO;
 import pyler.enums.ErrorCode;
 import pyler.exception.AuthException;
@@ -16,6 +18,7 @@ import pyler.exception.AuthException;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "jwt.client.enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 public class JwtAuthInterceptor implements HandlerInterceptor {
 
@@ -26,6 +29,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.debug("JwtAuthInterceptor preHandle for path: {}", request.getRequestURI());
 
         String jwt = resolveToken((request)); //Client Header 내의 JWt Token
 
@@ -34,14 +38,18 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
                 //Token 검증(pyler-jwt-server)
                 boolean isVal = jwtTokenClient.validationToken(jwt);
 
-                if(!isVal)
+                if(!isVal){
+                    log.error("유효하지 않은 토큰: {}", jwt);
                     throw new AuthException(ErrorCode.INVALID_TOKEN);
+                }
 
                 TokenInfoDTO tokenInfoDTO = jwtTokenClient.tokenInfo(jwt); //token 정보
 
                 request.setAttribute("userId", tokenInfoDTO.getUserId());
                 request.setAttribute("userEmail", tokenInfoDTO.getUserEmail());
-                request.setAttribute("userRole", tokenInfoDTO.getUserRole());
+                request.setAttribute("isMaster", tokenInfoDTO.getIsMaster());
+
+                log.debug("인증 Success - user: {}", tokenInfoDTO.getUserEmail());
 
                 return true;
 
@@ -50,7 +58,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
                 throw new AuthException(ErrorCode.INVALID_TOKEN);
             }
         }
-
+        log.error("Token Header Error");
         throw new AuthException(ErrorCode.UNAUTHORIZED);
     }
 

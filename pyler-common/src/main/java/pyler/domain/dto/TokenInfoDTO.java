@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class TokenInfoDTO {
     private Long userId;
     private String userEmail;
-    private Integer userRole;
+    private Boolean isMaster;
 }

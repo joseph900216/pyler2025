@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pyler.contents.RequestMap;
 import pyler.domain.dto.*;
-import pyler.domain.entity.UserEntity;
-import pyler.enums.ErrorCode;
 import pyler.service.UserService;
 
 @Slf4j
@@ -36,9 +34,9 @@ public class UserController {
      * @param userLoginDTO
      * @return
      */
-    @GetMapping(RequestMap.user + "/login")
+    @PostMapping(RequestMap.user + "/login")
     public ResponseEntity<?> getUserLogin(@Valid @RequestBody UserLoginDTO userLoginDTO) {
-        UserResDTO userResDTO = userService.getUserLogin(userLoginDTO);
-        return ResEntity.success(userResDTO);
+        TokenDTO tokenDTO = userService.postUserLogin(userLoginDTO);
+        return ResEntity.success(tokenDTO);
     }
 }

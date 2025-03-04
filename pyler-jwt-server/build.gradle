@@ -1,15 +1,26 @@
 dependencies {
+    // 공통 모듈 의존성
     implementation project(':pyler-common')
 
+    // 웹 & 보안
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // JWT 의존성
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // 데이터베이스
+    runtimeOnly 'org.postgresql:postgresql'
 
-    // 테스트 의존성
+    // 테스트
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// 실행 가능한 Jar
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
 }
