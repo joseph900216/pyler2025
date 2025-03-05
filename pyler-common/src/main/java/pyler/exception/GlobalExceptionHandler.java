@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import pyler.domain.dto.ErrorResponse;
 import pyler.domain.dto.FieldError;
 import pyler.enums.ErrorCode;
@@ -14,7 +15,9 @@ import pyler.enums.ErrorCode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Comment("전역 예외처리")
+/**
+ * 전역 예외처리
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -58,6 +61,19 @@ public class GlobalExceptionHandler {
                 .status(errorCode.getStatus())
                 .body(ErrorResponse.of(errorCode));
     }
+
+    // 파일 크기 초과 예외 처리
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(ErrorCode.IMAGE_SIZE_ERROR.getStatus())
+                .body(ErrorResponse.of(ErrorCode.IMAGE_IS_NOT_EXIST));
+    }
+
+    // ServiceException 처리
+//    @ExceptionHandler(ServiceException.class)
+//    public ResponseEntity<ErrorResponse> handleServiceException(ServiceException ex) {
+//        return ResponseEntity.badRequest().body(ex.getMessage());
+//    }
 
     /***
      * Filed Error 변환 유틸 메소트

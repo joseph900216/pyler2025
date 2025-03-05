@@ -1,7 +1,6 @@
 package pyler.service;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,7 +28,7 @@ public class JwtTokenValidationService {
     public boolean validatetoken(String token) {
         try {
             Jwts.parserBuilder()
-                    . setSigningKey(jwtKeyProvider.getSignKey())
+                    .setSigningKey(jwtKeyProvider.getSignKey())
                     .build()
                     .parseClaimsJws(token);
 
@@ -41,12 +40,18 @@ public class JwtTokenValidationService {
 
             return true;
 
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 JWT 서명입니다.");
+            throw new AuthException(ErrorCode.INVALID_TOKEN, "잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            log.error("Token 만료");
-            throw new AuthException(ErrorCode.INVALID_TOKEN, "만료된 JWt Token");
+            log.error("만료된 JWT 토큰입니다.");
+            throw new AuthException(ErrorCode.INVALID_TOKEN, "만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰입니다.");
+            throw new AuthException(ErrorCode.INVALID_TOKEN, "지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            log.error("JWT Token Error");
-            throw new AuthException(ErrorCode.INVALID_TOKEN, "잘못된 JWT Token");
+            log.error("JWT 토큰이 잘못되었습니다.");
+            throw new AuthException(ErrorCode.INVALID_TOKEN, "JWT 토큰이 잘못되었습니다.");
         } catch (Exception e) {
             log.error("JWT Exception Error: {}", e.getMessage());
             throw new AuthException(ErrorCode.INVALID_TOKEN, "JWt Exception Error");

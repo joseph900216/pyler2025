@@ -31,7 +31,7 @@ public class JwtTokenExtractionService {
             return Jwts.parserBuilder()
                     .setSigningKey(jwtKeyProvider.getSignKey())
                     .build()
-                    .parseClaimsJwt(token)
+                    .parseClaimsJws(token)
                     .getBody();
 
         } catch (ExpiredJwtException e) {

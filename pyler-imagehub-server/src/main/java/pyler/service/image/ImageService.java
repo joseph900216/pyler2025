@@ -1,4 +1,4 @@
-package pyler.service;
+package pyler.service.image;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ImageUploadService{
+public class ImageService {
 
     @Value("${file.uploadDir}")
     private String uploadDir;
@@ -35,7 +37,7 @@ public class ImageUploadService{
      */
     public String imageUpload(MultipartFile multipartFile) throws IOException {
 
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(URLEncoder.encode(multipartFile.getOriginalFilename(), StandardCharsets.UTF_8.toString()));
         String uniqueFileName = UUID.randomUUID() + "_" + fileName;
 
         Path uploadPath = Paths.get(uploadDir);
@@ -48,6 +50,15 @@ public class ImageUploadService{
         Files.copy(multipartFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
         return uniqueFileName;
+    }
+
+    public String imageExt(MultipartFile multipartFile) throws IOException {
+        String fileName = StringUtils.cleanPath(URLEncoder.encode(multipartFile.getOriginalFilename(), StandardCharsets.UTF_8.toString()));
+        int lastIdx = fileName.lastIndexOf(".");
+        if (lastIdx == -1)
+            throw new IllegalAccessError("확자가 없는 파일.");
+
+        return fileName.substring(lastIdx + 1).toLowerCase();
     }
 
     /**

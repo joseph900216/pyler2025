@@ -90,7 +90,7 @@ public class JwtTokenCreateService {
                 .claim("isMaster", isMaster)
                 .setIssuedAt(nowDate)
                 .setExpiration(new Date(nowDate.getTime() + accessTokenExpire))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS384)
                 .compact();
     }
 }

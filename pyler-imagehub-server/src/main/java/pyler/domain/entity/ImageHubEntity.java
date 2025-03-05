@@ -6,7 +6,9 @@ import pyler.domain.entity.BaseEntity;
 import pyler.enums.CategoryEnum;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -52,6 +54,30 @@ public class ImageHubEntity extends BaseEntity {
 
     @Column(name = "UPDATOR_ID")
     private long updatorId;
+
+
+    @OneToMany(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<ImageCategoryEntity> imageCategoryEntities = new HashSet<>();
+
+    public void addCategory(CategoryEntity categoryEntity) {
+        if (imageCategoryEntities.size() < 5) {
+            ImageCategoryEntity imageCategoryEntity = new ImageCategoryEntity(this, categoryEntity, creatorId);
+            imageCategoryEntities.add(imageCategoryEntity);
+        }
+    }
+
+    public void removeCategory(CategoryEntity categoryEntity) {
+        imageCategoryEntities.remove(categoryEntity);
+    }
+
+    public void changeDescription(String description) {
+        this.imageDescription = description;
+    }
+
+    public void changeIsDel(Long imageId) {
+        this.id = imageId;
+    }
 
 
 

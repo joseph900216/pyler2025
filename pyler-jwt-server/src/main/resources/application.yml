@@ -35,4 +35,4 @@ logging:
     org.springframework.security: DEBUG
 
 jwt:
-  secret: "7Cx5ZrJz4NvRHkWplPKif6HhTyjZ9Mq8TF99h+vKXM02ft9FBeV/pJMYP8x47wJyxhkW6l0PbOapORDBrFdXiQ=="
+  secret: "1gLZ1X2OE7duZXteWrGSjD8peLgX3fqqLl7YFRW5yuHKwMayX1DI40rBl8w6cSTJuKprAw84McZPWikhGdk9XQ=="
